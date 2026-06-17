@@ -30,7 +30,7 @@ MICROSTEP_MODES = {
 MODE = 'full'
 
 def setup():
-    GPIO.setmode(GPIO.BCM) #Postavlja brojeve po pinovima
+    # GPIO.setmode(GPIO.BCM) #Postavlja brojeve po pinovima
     for pin in (DIR_PIN, STEP_PIN, M0_PIN, M1_PIN, M2_PIN):
         GPIO.setup(pin, GPIO.OUT)
 
@@ -39,6 +39,15 @@ def setup():
     GPIO.output(M0_PIN, GPIO.HIGH if m0 else GPIO.LOW)
     GPIO.output(M1_PIN, GPIO.HIGH if m1 else GPIO.LOW)
     GPIO.output(M2_PIN, GPIO.HIGH if m2 else GPIO.LOW)
+
+def step_once(direction, min_delay=0.0005):
+
+    GPIO.output(DIR_PIN, GPIO.HIGH if direction else GPIO.LOW)
+
+    GPIO.output(STEP_PIN, GPIO.HIGH)
+    time.sleep(min_delay)
+    GPIO.output(STEP_PIN, GPIO.LOW)
+    time.sleep(min_delay)
 
 def rotate(revolutions, direction, accel_steps=50, min_delay=0.0005, max_delay=0.01):
     """Rotate with acceleration from max_delay to min_delay."""
@@ -66,32 +75,31 @@ def rotate(revolutions, direction, accel_steps=50, min_delay=0.0005, max_delay=0
         time.sleep(min_delay)
 
     #Deceleration phase
-    for i in range(accel_steps, 0, -1): # mpr 5 4 3 2 1
+    for i in range(accel_steps, 0, -1): # npr 5 4 3 2 1
         delay = max_delay - (max_delay - min_delay) * (i / accel_steps)
         GPIO.output(STEP_PIN, GPIO.HIGH)
         time.sleep(delay)
         GPIO.output(STEP_PIN, GPIO.LOW)
         time.sleep(delay)
 
+# def main():
+#     # setup()
+#     print(f"Mode: {MODE}, {MICROSTEP_MODES} microsteps/full step") #IZMIJENI
+#     try:
+#         while True:
+#             print("Rotating forward 360°...")
+#             rotate(1, direction = 1)
+#             time.sleep(1)
 
-def main():
-    setup()
-    print(f"Mode: {MODE}, {MICROSTEP_MODES} microsteps/full step") #IZMIJENI
-    try:
-        while True:
-            print("Rotating orward 360°...")
-            rotate(1, direction = 1)
-            time.sleep(1)
+#             print("Rotating backward 360°...")
+#             rotate(1, direction = 0)
+#             time.sleep(1)
 
-            print("Rotating backward 360°...")
-            rotate(1, direction = 0)
-            time.sleep(1)
+#     except KeyboardInterrupt:
+#         print("\nInterrupted by user")
+#     finally:
+#         GPIO.cleanup() #konstantno resetuje koriscene pinove u slucaju da ih nismo zamijenili sa nekim drugim
+#         print("Done. GPIO cleaned up")
 
-    except KeyboardInterrupt:
-        print("\nInterrupted by user")
-    finally:
-        GPIO.cleanup() #konstantno resetuje koriscene pinove u slucaju da ih nismo zamijenili sa nekim drugim
-        print("Done. GPIO cleaned up")
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
