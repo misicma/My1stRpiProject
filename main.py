@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
 import ir_sensor
 import servo
+from robot import Robot
 
-#!/usr/bin/env python3
 import RPi.GPIO as GPIO
 import time
+from datetime import datetime
 
 import sys
 
@@ -11,21 +13,21 @@ def main():
     # Write the core logic of your program here
     GPIO.setmode(GPIO.BCM) #pinovi odgovaraju onom u datasheet-u
 
-    ir_sensor.setup()
-    servo.setup()
-    print("Main je otpoceo radnju")
-    try:
-        while True:
-            if GPIO.input(ir_sensor.IN_PIN):
-                print("Object detected - running")
-                # servo.rotate(1, direction=1)
-                servo.step_once(direction = 1)
-            else:
-                print("Nothing detected.")
-            time.sleep(0.01)
-    except KeyboardInterrupt:
-        GPIO.cleanup()
-    # ir_sensor.detecting()
-    # servo.rotate()
+    # ir_sensor.setup()
+    # servo.setup()
 
-main()
+    print("Main je otpoceo radnju")
+
+    robot = Robot()
+
+    try:
+        #Pokreni robota
+        robot.start()
+    except KeyboardInterrupt:
+        print("Program interrupted")
+        robot.stop()
+    finally:
+        GPIO.cleanup()
+
+if __name__ == "__main__":
+    main()
