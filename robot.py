@@ -36,6 +36,7 @@ class Robot:
                         # print("Object detected - running")
                         # servo.rotate(1, direction=1)
                         servo.step_once(direction = 1)
+                        print(f"We have {self.detection_count} detection counts")
                     else:
                         f.writelines(f"\nNothing detected at {datetime.now().isoformat()}")
                         print("Nothing detected.")
@@ -53,7 +54,7 @@ class Robot:
     def run(self):
         self.start()
         pass
-
+ 
     def get_status(self):
         return{
             'running' : self.running,
